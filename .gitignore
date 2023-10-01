@@ -46,6 +46,7 @@ venv/
 # Sensitive Information
 config.json
 secrets.yaml
+.cache
 
 # Miscellaneous
 .DS_Store
