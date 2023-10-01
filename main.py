@@ -34,11 +34,13 @@ diary_playlists = spotify_diary.query_diary_playlists()
 playlist_songs, song_appearance, artist_counter, song_counter = spotify_diary.query_diary_playlists_songs(diary_playlists)
 
 # Scope are all tracks - not necesarily of my diary
-# FIXME: There is still an error. Also think how to optimize. Do you really need all the data? I don't think so. Track_Id should be sufficent to kickout the tracks later.
+# FIXME: 
+#   There is still an error. Also think how to optimize. Do you really need all the data? I don't think so. Track_Id should be sufficent to kickout the tracks later.
 my_top_track_all_time = spotify_diary.get_top_tracks_all_time()
 print(my_top_track_all_time)
 
-# TODO: Add another method in Spotify which gives you fast to be processes list of track Ids. This can be later used to kick out all tracks which are not part of your diary
+# TODO: 
+#   Add another method in Spotify which gives you fast to be processes list of track Ids. This can be later used to kick out all tracks which are not part of your diary
 
 
 
@@ -79,6 +81,7 @@ def print_top_10_songs(song_counter, song_appearance):
 
 
 #TODOS:
+
 # Function to find your most played songs out of the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
 
 # Function to find out the most played artists out of the artistst presented - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
