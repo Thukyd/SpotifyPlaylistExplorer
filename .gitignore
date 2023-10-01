@@ -50,4 +50,4 @@ secrets.yaml
 # Miscellaneous
 .DS_Store
 *.log
-playlist.txt
+playlists.txt
