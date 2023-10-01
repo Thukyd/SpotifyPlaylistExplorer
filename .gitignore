@@ -1,0 +1,53 @@
+# Compiled files
+*.o
+*.so
+*.dll
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+
+# Node modules and package-lock for JavaScript projects
+node_modules/
+package-lock.json
+
+# Python Bytecode
+__pycache__/
+
+# Java compiled files
+*.class
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Python Bytecode
+__pycache__/
+
+# Virtual Environment
+venv/
+.env
+
+# IDE/Editor
+.idea/
+.vscode/
+
+# Sensitive Information
+config.json
+secrets.yaml
+
+# Miscellaneous
+.DS_Store
+*.log
+playlist.txt
