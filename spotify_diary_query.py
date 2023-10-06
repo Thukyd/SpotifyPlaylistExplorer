@@ -19,14 +19,6 @@ class SpotifyDiary:
         # Regular expression pattern to filter playlists based on naming schema
         self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)(?: und (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember))? \d{4} *- *+'
 
-    # TODO: Just for testing
-    def make_api_call(self):
-        offset = 0
-        try:
-            return self.sp.current_user_playlists(offset=offset,limit=50)["items"]
-        except Exception as api_error:
-            print(f"An error occurred during the API call: {api_error}")
-            return None
 
     def query_diary_playlists(self):
         print("Starting to fetch and filter playlists based on the pattern...")
@@ -39,7 +31,7 @@ class SpotifyDiary:
             while True:
                 print("About to make API call...")
                 try:
-                    playlists = self.sp.current_user_playlists(offset=offset)["items"]
+                    playlists = self.sp.current_user_playlists(offset=offset, limit=500)["items"]
                     print("API call successful.")
                 except Exception as api_error:
                     print(f"An error occurred during the API call: {api_error}")

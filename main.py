@@ -28,16 +28,6 @@ spotify_diary = SpotifyDiary(client_id, client_secret, redirect_uri, scope)
 #diary_playlists = spotify_diary.query_diary_playlists()
 #print(diary_playlists)
 
-"""
-TEST
-"""
-test = spotify_diary.make_api_call()
-print(test)
-"""
-TEST END
-"""
-
-
 diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
 print(diary_playlists_tracks)
 
