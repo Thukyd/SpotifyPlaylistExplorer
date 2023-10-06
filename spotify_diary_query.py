@@ -19,30 +19,13 @@ class SpotifyDiary:
         # Regular expression pattern to filter playlists based on naming schema
         self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)(?: und (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember))? \d{4} *- *+'
 
-    def get_top_tracks_all_time(self):
-        print("Starting to fetch top 50 tracks of all time...")
+    # TODO: Just for testing
+    def make_api_call(self):
+        offset = 0
         try:
-            top_tracks_data = {}
-            # Get top tracks for the current user over the long term
-            time_range = 'long_term'
-            results = self.sp.current_user_top_tracks(limit=50, time_range=time_range)
-
-            # Check if 'items' key exists in results
-            if 'items' not in results:
-                print("Error: 'items' key not found in the API response.")
-                return None
-
-            # Populate the top_tracks_data dictionary
-            for idx, item in enumerate(results['items']):
-                top_tracks_data[idx + 1] = {
-                    'artist': item['artists'][0]['name'],
-                    'track': item['name'],
-                    'track_id': item['id']
-                }
-            print("Successfully fetched top 50 tracks of all time.")
-            return top_tracks_data
-        except Exception as e:
-            print(f"An error occurred: {e}")
+            return self.sp.current_user_playlists(offset=offset,limit=50)["items"]
+        except Exception as api_error:
+            print(f"An error occurred during the API call: {api_error}")
             return None
 
     def query_diary_playlists(self):
@@ -50,11 +33,18 @@ class SpotifyDiary:
         try:
             # Initialize an empty list to hold filtered playlists
             filtered_playlists = []
-
-            # Fetch and filter user's playlists based on the regex pattern
+            
+            # Initialize offset for API pagination
             offset = 0
             while True:
-                playlists = self.sp.current_user_playlists(offset=offset)["items"]
+                print("About to make API call...")
+                try:
+                    playlists = self.sp.current_user_playlists(offset=offset)["items"]
+                    print("API call successful.")
+                except Exception as api_error:
+                    print(f"An error occurred during the API call: {api_error}")
+                    return None
+
                 if not playlists:
                     break
 
@@ -73,15 +63,14 @@ class SpotifyDiary:
             print(f"An error occurred: {e}")
             return None
 
-    
     def fetch_track_details_from_playlist(self):
         # Initialize the data structure to hold track details
         track_data = defaultdict(list)
-
-        print("Fetching playlist details...")
         
         # Fetch and process each playlist
         playlists = self.query_diary_playlists()
+
+        print("Fetching tracks from playlists...")
         for playlist in playlists:
             playlist_id = playlist['id']
             playlist_name = playlist['name']
@@ -113,13 +102,37 @@ class SpotifyDiary:
         print("Completed fetching track details.")
         return track_data
     
+    def get_top_tracks_all_time(self):
+        print("Starting to fetch top 50 tracks of all time...")
+        try:
+            top_tracks_data = {}
+            # Get top tracks for the current user over the long term
+            time_range = 'long_term'
+            results = self.sp.current_user_top_tracks(limit=50, time_range=time_range)
+
+            # Check if 'items' key exists in results
+            if 'items' not in results:
+                print("Error: 'items' key not found in the API response.")
+                return None
+
+            # Populate the top_tracks_data dictionary
+            for idx, item in enumerate(results['items']):
+                top_tracks_data[idx + 1] = {
+                    'artist': item['artists'][0]['name'],
+                    'track': item['name'],
+                    'track_id': item['id']
+                }
+            print("Successfully fetched top 50 tracks of all time.")
+            return top_tracks_data
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    
     # Method to filter top 50 favorite tracks based on their presence in other playlists
-    def filter_top_50_tracks(self):
+    def filter_top_50_tracks(self, playlist_tracks):
         print("Starting to filter Top 50 tracks based on playlist tracks...")
         try:
-            # Fetch track details from playlists
-            playlist_tracks = self.fetch_track_details_from_playlist()
-
             # Fetch my top 50 songs of all time (not only from the diary)
             top_50_favorites = self.get_top_tracks_all_time()
             

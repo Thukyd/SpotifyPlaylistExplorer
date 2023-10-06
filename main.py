@@ -25,9 +25,21 @@ scope = config.get("scope")
 spotify_diary = SpotifyDiary(client_id, client_secret, redirect_uri, scope)
 # a) get all of your diary playlists
 # TODO: You are using the query_diary twice in your code. Maybe it's not needed. Find a better way.
-diary_playlists = spotify_diary.query_diary_playlists()
+#diary_playlists = spotify_diary.query_diary_playlists()
 #print(diary_playlists)
 
+"""
+TEST
+"""
+test = spotify_diary.make_api_call()
+print(test)
+"""
+TEST END
+"""
+
+
+diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
+print(diary_playlists_tracks)
 
 # b) Get more sepcifc data
 # FIXME: This is not a good strcuture - please refactor "query_diary_playlists_songs"
@@ -41,14 +53,13 @@ diary_playlists = spotify_diary.query_diary_playlists()
         {'JAY-Z': 38, 'Chefket': 30, 'Tyler, The Creator': 28, ....
     song_counter:
         {'Let U Know': 10, 'Love Will Tear Us Apart': 10, 'Goodbye (feat. Lyse) - Radio Edit': 10, 'Easy': 10, ...
-
 """
 # playlist_songs, song_appearance, artist_counter, song_counter = spotify_diary.query_diary_playlists_songs(diary_playlists)
 
 
 # c) Find your most played songs out of the lists
 #TODO: You have the data structure but you need a better way how to print this in Data Analysis
-print(spotify_diary.filter_top_50_tracks())
+print(spotify_diary.filter_top_50_tracks(diary_playlists_tracks))
 
 
 ########
