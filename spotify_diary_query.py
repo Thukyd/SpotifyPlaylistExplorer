@@ -74,7 +74,7 @@ class SpotifyDiary:
             return None
 
     
-    def fetch_track_details(self):
+    def fetch_track_details_from_playlist(self):
         # Initialize the data structure to hold track details
         track_data = defaultdict(list)
 
@@ -118,7 +118,7 @@ class SpotifyDiary:
         print("Starting to filter Top 50 tracks based on playlist tracks...")
         try:
             # Fetch track details from playlists
-            playlist_tracks = self.fetch_track_details()
+            playlist_tracks = self.fetch_track_details_from_playlist()
 
             # Fetch my top 50 songs of all time (not only from the diary)
             top_50_favorites = self.get_top_tracks_all_time()
