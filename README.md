@@ -38,7 +38,7 @@ self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Okto
      "client_id": "your_client_id_here",
      "client_secret": "your_client_secret_here",
      "redirect_uri": "your_redirect_uri_here",
-     "scope": "your_scope_here"
+     "scope": "playlist-read-private, user-top-read"
    }
    ```
    

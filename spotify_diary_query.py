@@ -20,43 +20,126 @@ class SpotifyDiary:
         self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)(?: und (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember))? \d{4} *- *+'
 
     def get_top_tracks_all_time(self):
-        top_tracks_data = {}
-        # Get top tracks for the current user over the long term
-        time_range = 'long_term'
-        results = self.sp.current_user_top_tracks(limit=50, time_range=time_range)
+        print("Starting to fetch top 50 tracks of all time...")
+        try:
+            top_tracks_data = {}
+            # Get top tracks for the current user over the long term
+            time_range = 'long_term'
+            results = self.sp.current_user_top_tracks(limit=50, time_range=time_range)
 
-        # Populate the top_tracks_data dictionary
-        for idx, item in enumerate(results['items']):
-            top_tracks_data[idx + 1] = {
-                'artist': item['artists'][0]['name'],
-                'track': item['name'],
-                'track_id': item['id']
-            }
-        return top_tracks_data
+            # Check if 'items' key exists in results
+            if 'items' not in results:
+                print("Error: 'items' key not found in the API response.")
+                return None
 
+            # Populate the top_tracks_data dictionary
+            for idx, item in enumerate(results['items']):
+                top_tracks_data[idx + 1] = {
+                    'artist': item['artists'][0]['name'],
+                    'track': item['name'],
+                    'track_id': item['id']
+                }
+            print("Successfully fetched top 50 tracks of all time.")
+            return top_tracks_data
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
 
     def query_diary_playlists(self):
-        # Initialize an empty list to hold filtered playlists
-        filtered_playlists = []
+        print("Starting to fetch and filter playlists based on the pattern...")
+        try:
+            # Initialize an empty list to hold filtered playlists
+            filtered_playlists = []
 
-        # Fetch and filter user's playlists based on the regex pattern
-        offset = 0
-        while True:
-            playlists = self.sp.current_user_playlists(offset=offset)["items"]
-            if not playlists:
-                break
+            # Fetch and filter user's playlists based on the regex pattern
+            offset = 0
+            while True:
+                playlists = self.sp.current_user_playlists(offset=offset)["items"]
+                if not playlists:
+                    break
 
-            for playlist in playlists:
-                if re.match(self.pattern, playlist['name']):
-                    filtered_playlists.append({
-                        'name': playlist['name'],
-                        'id': playlist['id']
+                for playlist in playlists:
+                    if re.match(self.pattern, playlist['name']):
+                        filtered_playlists.append({
+                            'name': playlist['name'],
+                            'id': playlist['id']
+                        })
+
+                offset += len(playlists)
+            
+            print(f"Successfully fetched and filtered {len(filtered_playlists)} playlists.")
+            return filtered_playlists
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    
+    def fetch_track_details(self):
+        # Initialize the data structure to hold track details
+        track_data = defaultdict(list)
+
+        print("Fetching playlist details...")
+        
+        # Fetch and process each playlist
+        playlists = self.query_diary_playlists()
+        for playlist in playlists:
+            playlist_id = playlist['id']
+            playlist_name = playlist['name']
+
+            #print(f"Processing playlist: {playlist_name}")
+
+            # Fetch tracks in the current playlist
+            tracks = self.sp.playlist_tracks(playlist_id)["items"]
+            for track_info in tracks:
+                track = track_info.get('track', {})
+
+                # Check if track is not None
+                if track:
+                    track_id = track.get('id', 'Unknown')
+                    track_name = track.get('name', 'Unknown')
+                    artist_name = track.get('artists', [{}])[0].get('name', 'Unknown')
+                    
+                    #print(f"Adding track: {track_name} by {artist_name}")
+
+                    # Populate data structure
+                    track_data[track_id].append({
+                        'song_title': track_name,
+                        'artist': artist_name,
+                        'playlist': playlist_name
                     })
+                else:
+                    print(f"Warning: Encountered a track with no details. In Playlist {playlist_name}")
+            
+        print("Completed fetching track details.")
+        return track_data
+    
+    # Method to filter top 50 favorite tracks based on their presence in other playlists
+    def filter_top_50_tracks(self):
+        print("Starting to filter Top 50 tracks based on playlist tracks...")
+        try:
+            # Fetch track details from playlists
+            playlist_tracks = self.fetch_track_details()
 
-            offset += len(playlists)
-        return filtered_playlists
+            # Fetch my top 50 songs of all time (not only from the diary)
+            top_50_favorites = self.get_top_tracks_all_time()
+            
+            # Initialize a dictionary to hold the filtered top 50 tracks
+            filtered_top_50 = {}
+            
+            # Loop through the top 50 favorites and check if they are in the playlist_tracks
+            for rank, track_info in top_50_favorites.items():
+                track_id = track_info['track_id']
+                if track_id in playlist_tracks:
+                    filtered_top_50[rank] = track_info
+            
+            print(f"Successfully filtered. {len(filtered_top_50)} tracks remain in the Top 50 list.")
+            return filtered_top_50
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        return None
 
-
+#FIXME
+"""
     def query_diary_playlists_songs(self, playlists_to_query):
         # Initialize data structures for storing playlist data and for frequency analysis
         playlist_data = defaultdict(list)
@@ -124,3 +207,5 @@ class SpotifyDiary:
                 song_playlist_map[track_name].add(playlist_name)
 
         return playlist_data, song_playlist_map, artist_counter, song_counter
+
+ """

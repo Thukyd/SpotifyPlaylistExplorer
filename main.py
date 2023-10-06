@@ -1,14 +1,21 @@
 from spotify_diary_query import SpotifyDiary
 import json
+import sys
 
-# Load credentials from config.json
-with open("config.json", "r") as f:
-    config = json.load(f)
+try:
+    # Load credentials from config.json
+    with open("config.json", "r") as f:
+        config = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError) as e:
+    print(f"Error loading config.json: {e}")
+    sys.exit(1)
 
-client_id = config["client_id"]
-client_secret = config["client_secret"]
-redirect_uri = config["redirect_uri"]
-scope = config["scope"]
+client_id = config.get("client_id")
+client_secret = config.get("client_secret")
+redirect_uri = config.get("redirect_uri")
+scope = config.get("scope")
+
+# You can proceed with the rest of your code here.
 
 
 ########
@@ -17,9 +24,14 @@ scope = config["scope"]
 # Initialize the Spotify API client with necessary credentials and scope
 spotify_diary = SpotifyDiary(client_id, client_secret, redirect_uri, scope)
 # a) get all of your diary playlists
+# TODO: You are using the query_diary twice in your code. Maybe it's not needed. Find a better way.
 diary_playlists = spotify_diary.query_diary_playlists()
+#print(diary_playlists)
+
 
 # b) Get more sepcifc data
+# FIXME: This is not a good strcuture - please refactor "query_diary_playlists_songs"
+
 """
     playlist_songs: 
         {'September 2023 - Me and The Devil': [{'title': 'Me And The Devil', 'artist': 'Gil Scott-Heron', 'track_id': '76lCwB3Bu4tNcyXRLGvVba', 'playlist_id': '2boyaY9beajILnHZnzYJTD'},  ...
@@ -31,56 +43,21 @@ diary_playlists = spotify_diary.query_diary_playlists()
         {'Let U Know': 10, 'Love Will Tear Us Apart': 10, 'Goodbye (feat. Lyse) - Radio Edit': 10, 'Easy': 10, ...
 
 """
-playlist_songs, song_appearance, artist_counter, song_counter = spotify_diary.query_diary_playlists_songs(diary_playlists)
+# playlist_songs, song_appearance, artist_counter, song_counter = spotify_diary.query_diary_playlists_songs(diary_playlists)
 
-# Scope are all tracks - not necesarily of my diary
-# FIXME: 
-#   There is still an error. Also think how to optimize. Do you really need all the data? I don't think so. Track_Id should be sufficent to kickout the tracks later.
-my_top_track_all_time = spotify_diary.get_top_tracks_all_time()
-print(my_top_track_all_time)
 
-# TODO: 
-#   Add another method in Spotify which gives you fast to be processes list of track Ids. This can be later used to kick out all tracks which are not part of your diary
-
+# c) Find your most played songs out of the lists
+#TODO: You have the data structure but you need a better way how to print this in Data Analysis
+print(spotify_diary.filter_top_50_tracks())
 
 
 ########
-## II.) Data Analysis
-
-
-# Function to find and print the top 10 artists in the filtered list, along with their tracks and playlists
-def print_top_10_artists(playlist_songs, artist_counter):
-    print("\n=== Top 10 Artists in Filtered Playlists ===")
-    for artist, count in artist_counter.most_common(10):
-        print(f"{artist} (appears {count} times)")
-        artist_tracks = []
-        artist_playlists = set()
-        for playlist, tracks in playlist_songs.items():
-            for track in tracks:
-                if track['artist'] == artist:
-                    artist_tracks.append(track['title'])
-                    artist_playlists.add(playlist)
-        print(f"  Tracks: {', '.join(artist_tracks)}")
-        print(f"  Playlists: {', '.join(artist_playlists)}")
-
-# Function to find and print the top 10 songs in the filtered list, along with the playlists they appear in
-def print_top_10_songs(song_counter, song_appearance):
-    print("\n=== Top 10 Songs in Filtered Playlists ===")
-    for song, count in song_counter.most_common(10):
-        print(f"{song} (appears {count} times)")
-        print(f"  Playlists: {', '.join(song_appearance[song])}")
-
-########
-## III.) Report
-
-
-# Call the functions to print the top 10 artists and songs
-#print_top_10_artists(playlist_songs, artist_counter)
-#print_top_10_songs(song_counter, song_appearance)
-
+## II.) Visualisations
 
 
 #TODOS:
+
+# Function to find and print the top 10 songs in the filtered list, along with the playlists they appear in
 
 # Function to find your most played songs out of the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
 
