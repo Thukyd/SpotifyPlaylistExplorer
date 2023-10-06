@@ -31,7 +31,7 @@ class SpotifyDiary:
             while True:
                 print("About to make API call...")
                 try:
-                    playlists = self.sp.current_user_playlists(offset=offset, limit=500)["items"]
+                    playlists = self.sp.current_user_playlists(offset=offset)["items"]
                     print("API call successful.")
                 except Exception as api_error:
                     print(f"An error occurred during the API call: {api_error}")
