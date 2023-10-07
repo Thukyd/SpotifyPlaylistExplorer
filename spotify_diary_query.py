@@ -5,6 +5,7 @@ import json
 import re
 from spotipy.oauth2 import SpotifyOAuth
 from collections import defaultdict, Counter
+import time
 
 
 class SpotifyDiary:
@@ -23,37 +24,48 @@ class SpotifyDiary:
     def query_diary_playlists(self):
         print("Starting to fetch and filter playlists based on the pattern...")
         try:
-            # Initialize an empty list to hold filtered playlists
+            # Initialize variables
             filtered_playlists = []
-            
-            # Initialize offset for API pagination
             offset = 0
+            batch_size = 50
+            max_filtered = 100
+
             while True:
-                print("About to make API call...")
+                print(f"About to make API call with offset {offset} and batch size {batch_size}...")
                 try:
-                    playlists = self.sp.current_user_playlists(offset=offset)["items"]
-                    print("API call successful.")
+                    playlists = self.sp.current_user_playlists(offset=offset, limit=batch_size)["items"]
+                    print(f"API call successful. Fetched {len(playlists)} playlists.")
                 except Exception as api_error:
                     print(f"An error occurred during the API call: {api_error}")
                     return None
 
                 if not playlists:
+                    print("No more playlists to fetch. Breaking out of the loop.")
                     break
 
                 for playlist in playlists:
                     if re.match(self.pattern, playlist['name']):
+                        print(f"Match found: {playlist['name']}")
                         filtered_playlists.append({
                             'name': playlist['name'],
                             'id': playlist['id']
                         })
 
+                    if len(filtered_playlists) >= max_filtered:
+                        print(f"Reached max filtered limit of {max_filtered}. Stopping early.")
+                        return filtered_playlists
+
+                print(f"Completed this batch. {len(filtered_playlists)} playlists match the pattern so far.")
                 offset += len(playlists)
-            
+                time.sleep(3)  # Small delay to prevent hitting rate limits
+
             print(f"Successfully fetched and filtered {len(filtered_playlists)} playlists.")
             return filtered_playlists
+
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
+
 
     def fetch_track_details_from_playlist(self):
         # Initialize the data structure to hold track details

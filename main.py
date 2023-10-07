@@ -29,7 +29,6 @@ spotify_diary = SpotifyDiary(client_id, client_secret, redirect_uri, scope)
 #print(diary_playlists)
 
 diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
-print(diary_playlists_tracks)
 
 # b) Get more sepcifc data
 # FIXME: This is not a good strcuture - please refactor "query_diary_playlists_songs"
