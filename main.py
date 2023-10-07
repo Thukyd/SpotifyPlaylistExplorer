@@ -2,9 +2,6 @@ from spotify_queries import SpotifyQueries
 from filter_and_analyse_data import FilterAndAnalyseData
 import json
 
-# You can proceed with the rest of your code here.
-
-
 ########
 ## I.) Spotify Queries
 
