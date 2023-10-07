@@ -33,58 +33,66 @@ class SpotifyQueries:
             self.token_type = auth_info['token_type']
             self.expires_in = auth_info['expires_in']
             self.refresh_token = auth_info.get('refresh_token')
+            #print("Authentication succeeded:", auth_response.text)
+            print("Authentication succeeded...")
         else:
             print("Authentication failed:", auth_response.text)
 
 
-def get_current_user_playlists(self):
-    logging.info("Fetching current user's playlists...")
-    # Define the API endpoint and headers for authentication
-    endpoint = "https://api.spotify.com/v1/me/playlists"
-    headers = {"Authorization": f"Bearer {self.access_token}"}
+    def get_current_user_playlists(self):
+        logging.info("Fetching current user's playlists...")
+        # Define the API endpoint and headers for authentication
+        endpoint = "https://api.spotify.com/v1/me/playlists"
+        headers = {"Authorization": f"Bearer {self.access_token}"}
 
-    # Make the API request
-    response = requests.get(endpoint, headers=headers)
+        # Make the API request
+        response = requests.get(endpoint, headers=headers)
 
-    # Check if the request was successful
-    if response.status_code == 200:
-        logging.info("Successfully fetched playlists.")
-        return json.loads(response.text)
-    else:
-        logging.error(f"Failed to fetch playlists: {response.text}")
-        return None
-    
-def get_playlist_tracks(self, playlist_id):
-    logging.info(f"Fetching tracks for playlist ID: {playlist_id}...")
-    # Define the API endpoint and headers for authentication
-    endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-    headers = {"Authorization": f"Bearer {self.access_token}"}
+        # Check if the request was successful
+        if response.status_code == 200:
+            logging.info("Successfully fetched playlists.")
+            return json.loads(response.text)
+        if response.status_code == 429:
+            logging.error(f"Failed to fetch playlists: {response.text}. The response code {response.status_code} is connected to Spotify developer limitations. Check here for more info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
+        else:
+            logging.error(f"Failed to fetch playlists: {response.text}")
+            return None
+        
+    def get_playlist_tracks(self, playlist_id):
+        logging.info(f"Fetching tracks for playlist ID: {playlist_id}...")
+        # Define the API endpoint and headers for authentication
+        endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        headers = {"Authorization": f"Bearer {self.access_token}"}
 
-    # Make the API request
-    response = requests.get(endpoint, headers=headers)
+        # Make the API request
+        response = requests.get(endpoint, headers=headers)
 
-    # Check if the request was successful
-    if response.status_code == 200:
-        logging.info(f"Successfully fetched tracks for playlist ID: {playlist_id}.")
-        return json.loads(response.text)
-    else:
-        logging.error(f"Failed to fetch tracks for playlist ID: {playlist_id}. Error: {response.text}")
-        return None
+        # Check if the request was successful
+        if response.status_code == 200:
+            logging.info(f"Successfully fetched tracks for playlist ID: {playlist_id}.")
+            return json.loads(response.text)
+        if response.status_code == 429:
+            logging.error(f"Failed to fetch tracks for playlist ID: {playlist_id}. Error: {response.text}. The response code {response.status_code} is connected to Spotify developer limitations. Check here for more info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
+        else:
+            logging.error(f"Failed to fetch tracks for playlist ID: {playlist_id}. Error: {response.text}")
+            return None
 
-def get_current_user_top_tracks(self):
-    logging.info("Fetching current user's top tracks...")
-    # Define the API endpoint and headers for authentication
-    endpoint = "https://api.spotify.com/v1/me/top/tracks"
-    headers = {"Authorization": f"Bearer {self.access_token}"}
+    def get_current_user_top_tracks(self):
+        logging.info("Fetching current user's top tracks...")
+        # Define the API endpoint and headers for authentication
+        endpoint = "https://api.spotify.com/v1/me/top/tracks"
+        headers = {"Authorization": f"Bearer {self.access_token}"}
 
-    # Make the API request
-    response = requests.get(endpoint, headers=headers)
+        # Make the API request
+        response = requests.get(endpoint, headers=headers)
 
-    # Check if the request was successful
-    if response.status_code == 200:
-        logging.info("Successfully fetched top tracks.")
-        return json.loads(response.text)
-    else:
-        logging.error(f"Failed to fetch top tracks: {response.text}")
-        return None
+        # Check if the request was successful
+        if response.status_code == 200:
+            logging.info("Successfully fetched top tracks.")
+            return json.loads(response.text)
+        if response.status_code == 429:
+            logging.error(f"Failed to fetch top tracks: {response.text}. The response code {response.status_code} is connected to Spotify developer limitations. Check here for more info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
+        else:
+            logging.error(f"Failed to fetch top tracks: {response.text}")
+            return None
 

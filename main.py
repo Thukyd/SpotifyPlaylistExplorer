@@ -1,6 +1,6 @@
 from spotify_queries import SpotifyQueries
 from filter_and_analyse_data import FilterAndAnalyseData
-
+import json
 
 # You can proceed with the rest of your code here.
 
@@ -8,11 +8,37 @@ from filter_and_analyse_data import FilterAndAnalyseData
 ########
 ## I.) Spotify Queries
 
+# Load Configs
+try:
+    # Load credentials from config.json
+    with open("config.json", "r") as f:
+        config = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError) as e:
+    print(f"Error loading config.json: {e}")
+    sys.exit(1)
+
+client_id = config.get("client_id")
+client_secret = config.get("client_secret")
+redirect_uri = config.get("redirect_uri")
+scope = config.get("scope")
+
+
+# Initialise Spotify connection
+spotify = SpotifyQueries(client_id, client_secret, redirect_uri, scope)
+spotify.authenticate()
+
+print(spotify.get_current_user_playlists())
+
+
+"""
+OLD!!
 # Initialize the Spotify API client with necessary credentials and scope
 spotify_diary = SpotifyDiary(client_id, client_secret, redirect_uri, scope)
 
 
 diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
+
+"""
 
 ########
 ## II.) Data Operations
@@ -20,7 +46,7 @@ diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
 
 # c) Find your most played songs out of the lists
 #TODO: You have the data structure but you need a better way how to print this in Data Analysis
-print(spotify_diary.filter_top_50_tracks(diary_playlists_tracks))
+#print(spotify_diary.filter_top_50_tracks(diary_playlists_tracks))
 
 
 ########
