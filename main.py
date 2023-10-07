@@ -59,15 +59,13 @@ diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
 ## III.) Visualisations
 
 
-#TODOS:
+# TODO: Function to find and print the top 10 songs in the filtered list, along with the playlists they appear in
 
-# Function to find and print the top 10 songs in the filtered list, along with the playlists they appear in
+# TODO: Function to find your most played songs out of the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
 
-# Function to find your most played songs out of the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
+# TODO: Function to find out the most played artists out of the artistst presented - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
 
-# Function to find out the most played artists out of the artistst presented - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
+# TODO: Function to find out the top 5 songes for each of the months represented by the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
 
-# Function to find out the top 5 songes for each of the months represented by the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
-
-# Function to find the most popular songs world wide from your selection - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter  
+# TODO: Function to find the most popular songs world wide from your selection - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter  
 
