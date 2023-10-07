@@ -24,6 +24,15 @@ scope = config.get("scope")
 spotify = SpotifyQueries(client_id, client_secret, redirect_uri, scope)
 spotify.authenticate()
 
+# Get Spotify data 
+""" TODO:
+Use the snapshot_id
+Playlist APIs expose a snapshot_id that corresponds to the version of the playlist that you are working with.
+Downloading a playlist can be expensive so some apps may want to store and
+refer to the snapshot_id to avoid refreshing an entire playlist that has not changed.
+You can learn more about snapshot_id in our Working with Playlists guide.
+https://developer.spotify.com/documentation/web-api/concepts/playlists 
+"""
 print(spotify.get_current_user_playlists())
 
 
