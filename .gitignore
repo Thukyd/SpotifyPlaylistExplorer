@@ -52,3 +52,4 @@ secrets.yaml
 .DS_Store
 *.log
 playlists.txt
+/archive
