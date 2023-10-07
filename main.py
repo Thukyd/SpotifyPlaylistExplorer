@@ -17,6 +17,7 @@ scope = config.get("scope")
 
 # You can proceed with the rest of your code here.
 
+#TODO: Refactor code. Don't use Spotipy! This gives a lot of headaches because of the restrictions!
 
 ########
 ## I.) Spotify Data Structure
