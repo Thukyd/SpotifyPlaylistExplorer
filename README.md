@@ -1,4 +1,5 @@
 # Spotify Playlist Explorer: My 10-Year Music Diary
+# TODO: Update Docs - refactor without Spotipy usage
 
 ## Introduction
 
