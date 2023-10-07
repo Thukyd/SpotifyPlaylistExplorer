@@ -1,5 +1,7 @@
 # Spotify Playlist Explorer: My 10-Year Music Diary
 # TODO: Update Docs - refactor without Spotipy usage
+https://developer.spotify.com/documentation/web-api
+
 
 ## Introduction
 
