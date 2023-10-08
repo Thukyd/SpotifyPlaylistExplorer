@@ -1,6 +1,9 @@
 # Spotify Playlist Explorer: My 10-Year Music Diary
 # TODO: Update Docs - refactor without Spotipy usage
-https://developer.spotify.com/documentation/web-api
+- direct API Usage instead of Spotioy https://developer.spotify.com/documentation/web-api
+- OAuth 2.0 implementation
+- Caching for playlists
+- Refactoring to Data queries
 
 
 ## Introduction
