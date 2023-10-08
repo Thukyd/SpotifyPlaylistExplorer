@@ -1,43 +1,99 @@
+# Import necessary modules
 from spotify_queries import SpotifyQueries
 from filter_and_analyse_data import FilterAndAnalyseData
+from http.server import HTTPServer, BaseHTTPRequestHandler  # For capturing the authorization code
+from urllib.parse import urlparse, parse_qs  # For parsing URL and query strings
 import json
+import sys
+import webbrowser  # For opening the web browser
+import threading  # For running the HTTP server in a separate thread and for threading.Event
+
+
 
 ########
-## I.) Spotify Queries
+## I. Loading Configs & Initialise Spotify
 
-# Load Configs
+# Load configuration from a JSON file
 try:
-    # Load credentials from config.json
     with open("config.json", "r") as f:
         config = json.load(f)
 except (FileNotFoundError, json.JSONDecodeError) as e:
     print(f"Error loading config.json: {e}")
     sys.exit(1)
 
+# Initialize Spotify API connection with loaded configuration
 client_id = config.get("client_id")
 client_secret = config.get("client_secret")
 redirect_uri = config.get("redirect_uri")
 scope = config.get("scope")
-
-
-# Initialise Spotify connection
 spotify = SpotifyQueries(client_id, client_secret, redirect_uri, scope)
-auth_url = spotify.generate_auth_url()
-print(f"Visit this URL to authorize the app: {auth_url}")
-auth_code = input("Enter the authorization code: ")
-spotify.fetch_access_token(auth_code)
-# You can now use methods like spotify.get_current_user_playlists() or spotify.get_current_user_top_tracks()
 
-# Get Spotify data 
-""" TODO:
-Use the snapshot_id
-Playlist APIs expose a snapshot_id that corresponds to the version of the playlist that you are working with.
-Downloading a playlist can be expensive so some apps may want to store and
-refer to the snapshot_id to avoid refreshing an entire playlist that has not changed.
-You can learn more about snapshot_id in our Working with Playlists guide.
-https://developer.spotify.com/documentation/web-api/concepts/playlists 
-"""
-spotify.get_current_user_playlists()
+########
+## II. OAuth 2.0 Flow
+
+# Create an event to signal when the access token is fetched
+access_token_fetched = threading.Event()
+
+# Function to get the authorization code from Spotify
+def get_auth_code():
+    # Custom handler to process incoming HTTP GET requests
+    class AuthHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            # Parse the query parameters from the URL
+            query = urlparse(self.path).query
+            query_components = parse_qs(query)
+            
+            # Extract the authorization code from the query parameters
+            auth_code = query_components["code"][0] if "code" in query_components else None
+            
+            if auth_code:
+                print(f"Authorization code: {auth_code}")
+                
+                # Fetch the access token using the authorization code
+                spotify.fetch_access_token(auth_code)
+                
+                # Set the event to signal that the access token has been fetched
+                access_token_fetched.set()
+                
+                # Send an HTTP 200 response
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                self.wfile.write(b'Access token fetched successfully.')
+            else:
+                # Handle the case where the authorization code is not found
+                self.send_response(400)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                self.wfile.write(b'Failed to fetch access token.')
+    
+    # Initialize HTTP server with custom handler
+    server = HTTPServer(('localhost', 8080), AuthHandler)
+    
+    # Run the HTTP server in a separate thread to handle a single request
+    thread = threading.Thread(target=server.handle_request)
+    thread.start()
+
+    # Open the Spotify authorization URL in the default web browser
+    auth_url = f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}"
+    webbrowser.open(auth_url)
+
+# Fetch the authorization code
+get_auth_code()
+
+# Wait for the access token to be fetched before continuing
+access_token_fetched.wait()
+
+########
+## III. Query Spotify
+
+# Continue with your Spotify API logic
+print()
+print("####################################################################")
+print()
+print(spotify.get_current_user_playlists())
+
+
 
 #spotify.get_current_user_top_tracks()
 
@@ -52,7 +108,7 @@ diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
 """
 
 ########
-## II.) Data Operations
+## IV.) Data Operations
 
 
 # c) Find your most played songs out of the lists
@@ -61,7 +117,7 @@ diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
 
 
 ########
-## III.) Visualisations
+## V.) Visualisations
 
 
 # TODO: Function to find and print the top 10 songs in the filtered list, along with the playlists they appear in
