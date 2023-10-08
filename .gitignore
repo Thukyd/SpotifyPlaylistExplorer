@@ -53,4 +53,4 @@ secrets.yaml
 *.log
 playlists.txt
 /archive
-spotify_playlists.json
+/cache

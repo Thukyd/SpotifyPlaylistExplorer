@@ -91,32 +91,8 @@ access_token_fetched.wait()
 
 
 #This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
-
-# TODO: change this. Maybe make the caching mechanism part of every function
-# #FIXME: also the return value is not a json file. parse it in a proper format
-def get_spotify_playlists():
-    # Define the path to the JSON file where the data will be stored
-    file_path = 'spotify_playlists.json'
-    
-    # Check if the JSON file already exists
-    if os.path.exists(file_path):
-        # If it exists, read the file to get the stored data
-        with open(file_path, 'r') as f:
-            playlists = json.load(f)
-    else:
-        # If it doesn't exist, make the API call to get the data
-        print("PLAYLIST NOT IN CACHE - MAKING AN API CALL")
-        playlists = spotify.get_current_user_playlists()
-        
-        # Store the data in the JSON file
-        with open(file_path, 'w') as f:
-            json.dump(playlists, f)
-    
-    # Return the playlists, either from the file or the API
-    return playlists
-
-# Usage
-playlists = get_spotify_playlists()
+#TODO: Cleanup the code of spotify queries. Maybe introducde something as debugging logging and normal operational logging
+spotify.load_or_fetch_playlists()
 
 
 
