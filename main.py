@@ -4,6 +4,7 @@ from filter_and_analyse_data import FilterAndAnalyseData
 from http.server import HTTPServer, BaseHTTPRequestHandler  # For capturing the authorization code
 from urllib.parse import urlparse, parse_qs  # For parsing URL and query strings
 import json
+import os
 import sys
 import webbrowser  # For opening the web browser
 import threading  # For running the HTTP server in a separate thread and for threading.Event
@@ -35,6 +36,7 @@ spotify = SpotifyQueries(client_id, client_secret, redirect_uri, scope)
 access_token_fetched = threading.Event()
 
 # Function to get the authorization code from Spotify
+# TODO: Make the loggings better. Don't give out the deubg logs here
 def get_auth_code():
     # Custom handler to process incoming HTTP GET requests
     class AuthHandler(BaseHTTPRequestHandler):
@@ -87,11 +89,38 @@ access_token_fetched.wait()
 ########
 ## III. Query Spotify
 
-# Continue with your Spotify API logic
-print()
-print("####################################################################")
-print()
-print(spotify.get_current_user_playlists())
+
+#This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
+
+# TODO: change this. Maybe make the caching mechanism part of every function
+# #FIXME: also the return value is not a json file. parse it in a proper format
+def get_spotify_playlists():
+    # Define the path to the JSON file where the data will be stored
+    file_path = 'spotify_playlists.json'
+    
+    # Check if the JSON file already exists
+    if os.path.exists(file_path):
+        # If it exists, read the file to get the stored data
+        with open(file_path, 'r') as f:
+            playlists = json.load(f)
+    else:
+        # If it doesn't exist, make the API call to get the data
+        print("PLAYLIST NOT IN CACHE - MAKING AN API CALL")
+        playlists = spotify.get_current_user_playlists()
+        
+        # Store the data in the JSON file
+        with open(file_path, 'w') as f:
+            json.dump(playlists, f)
+    
+    # Return the playlists, either from the file or the API
+    return playlists
+
+# Usage
+playlists = get_spotify_playlists()
+
+
+
+
 
 
 
