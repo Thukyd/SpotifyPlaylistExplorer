@@ -22,7 +22,11 @@ scope = config.get("scope")
 
 # Initialise Spotify connection
 spotify = SpotifyQueries(client_id, client_secret, redirect_uri, scope)
-spotify.authenticate()
+auth_url = spotify.generate_auth_url()
+print(f"Visit this URL to authorize the app: {auth_url}")
+auth_code = input("Enter the authorization code: ")
+spotify.fetch_access_token(auth_code)
+# You can now use methods like spotify.get_current_user_playlists() or spotify.get_current_user_top_tracks()
 
 # Get Spotify data 
 """ TODO:
@@ -33,8 +37,9 @@ refer to the snapshot_id to avoid refreshing an entire playlist that has not cha
 You can learn more about snapshot_id in our Working with Playlists guide.
 https://developer.spotify.com/documentation/web-api/concepts/playlists 
 """
-print(spotify.get_current_user_playlists())
+spotify.get_current_user_playlists()
 
+#spotify.get_current_user_top_tracks()
 
 """
 OLD!!
