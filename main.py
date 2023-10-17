@@ -104,6 +104,12 @@ playlist = spotify.load_or_fetch_playlists()
 ########
 ## IV.) Data Operations
 
+# Create an instance of the FilterAndAnalyseData class
+#TODO: use patern to find the date in the playlist name - think about where to store this? Directly here in the code? In the config file?
+pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)(?: und (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember))? \d{4} *- *+'
+#spotify_diary = FilterAndAnalyseData()
+
+
 
 # c) Find your most played songs out of the lists
 #TODO: You have the data structure but you need a better way how to print this in Data Analysis
