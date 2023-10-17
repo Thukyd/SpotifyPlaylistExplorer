@@ -34,6 +34,7 @@ access_token_fetched = threading.Event()
 
 # Function to get the authorization code from Spotify
 # TODO: Make the loggings better. Don't give out the deubg logs here
+# TODO: Externalize 
 def get_auth_code():
     # Custom handler to process incoming HTTP GET requests
     class AuthHandler(BaseHTTPRequestHandler):
