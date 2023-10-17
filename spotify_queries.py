@@ -97,7 +97,7 @@ class SpotifyQueries:
         else:
             raise FileNotFoundError(f"No cached data found at {file_path}")
 
-
+# TODO: Think about if you want to invalidate the cache after a certain amount of time
     def cache_data(self, data, file_name):
         """
         Cache the user's Spotify data in a JSON file.
