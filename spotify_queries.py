@@ -45,50 +45,106 @@ class SpotifyQueries:
         else:
             print(f"Failed to get access token: {response.text}")
 
-    def load_or_fetch_playlists(self):
+    def cached_data_available(self, file_name):
         """
-        Retrieve the user's Spotify playlists, either from a cached JSON file or via an API call.
-        
-        This method first checks if the playlists are already cached in a JSON file.
-        If they are, it reads the file and returns the playlists.
-        If not, it makes an API call to fetch the playlists, caches them in a JSON file,
-        and then returns them.
-        
+        Check if the user's Spotify data is already cached in a JSON file.
+
+        Parameters:
+            file_name (str): The name of the file to check for in the cache.
+
         Returns:
-            playlists (list or dict): List of dictionaries, each containing information about a playlist.
+            bool: True if the data is cached (i.e., file exists), False otherwise.
         """
-        # Define the path to the JSON file where the data will be stored
-        file_path = './cache/users_playlists.json'
+
+        # If the file_name already contains the cache directory path, use it as is.
+        # Otherwise, append the cache directory path to the file_name.
+        print(f"Checking cached_data_available for file: {file_name}")
+        file_path = f'./cache/{file_name}.json'
+
+        # Check if the file exists in the cache directory
+        if os.path.exists(file_path):
+            # print(f"File exists: True")
+            return True
+        else:
+            # print(f"File exists: False")
+            return False
+
+
+    def load_cached_data(self, file_name):
+        """
+        Load the user's Spotify data from a cached JSON file.
         
+        Parameters:
+            file_name (str): The name of the JSON file to read from the cache.
+            
+        Returns:
+            dict: The data read from the JSON file.
+            
+        Raises:
+            FileNotFoundError: If the specified JSON file does not exist in the cache.
+        """
+
+        # Define the path to the JSON file where the data will be stored
+        file_path = f'./cache/{file_name}.json'
+        
+        # Check if the JSON file already exists
+        if self.cached_data_available(file_name):
+            print("Spotify data in cache - Reading from file")
+            # Read the cached data from the JSON file
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            return data
+        else:
+            raise FileNotFoundError(f"No cached data found at {file_path}")
+
+
+    def cache_data(self, data, file_name):
+        """
+        Cache the user's Spotify data in a JSON file.
+        
+        Parameters:
+            data (dict or list): Data to be cached, which can be a dictionary or a list of dictionaries.
+            file_name (str): The name of the JSON file where the data will be stored.
+        """
+
         # Create the 'cache' directory if it doesn't exist
         if not os.path.exists('./cache'):
             print("Creating 'cache' directory...")
             os.makedirs('./cache')
         
-        # Check if the JSON file already exists
-        if os.path.exists(file_path):
-            print("Fetching playlists from cache...")
-            # If it exists, read the file to get the stored data
-            with open(file_path, 'r') as f:
-                playlists = json.load(f)
-        else:
-            print("PLAYLIST NOT IN CACHE - MAKING AN API CALL")
-            data = self.collect_all_playlists_for_user() 
-
-            # If the data is a dictionary, try to get 'items'; otherwise, use data as is
-            if isinstance(data, dict):
-                print("Data is a dictionary. Fetching 'items' key.")
-                playlists = data.get("items", [])
-            else:
-                print("Data is not a dictionary. Using data as-is.")
-                playlists = data
-
-            # Store the data in the JSON file
-            with open(file_path, 'w') as f:
-                json.dump(playlists, f)
+        # Define the path to the JSON file where the data will be stored
+        file_path = f'./cache/{file_name}.json'
         
-        # Return the playlists, either from the file or the API
-        return playlists
+        # Write the cached data to the JSON file
+        with open(file_path, 'w') as f:
+            json.dump(data, f)
+        print("Spotify data cached successfully.")
+        
+    
+    def load_or_fetch_playlists(self):
+        """
+        Retrieve the user's Spotify playlists. If cached data is available, it reads from the cache;
+        otherwise, it fetches the data via an API call and then caches it.
+        
+        Returns:
+            list: A list of dictionaries, each containing information about a playlist.
+        """
+
+        # Define the path to the JSON file where the data will be stored
+            #file_path = './cache/users_playlists.json'
+        file_name = "users_playlists"
+
+        if self.cached_data_available(file_name):
+            print("Spotify data in cache - Reading from file")
+            # Read the cached data from the JSON file
+            playlists = self.load_cached_data(file_name)
+            return playlists
+        else:
+            print("Fetching Spotify data via API...")
+            playlists = self.collect_all_playlists_for_user()
+            # Cache the playlists in a JSON file
+            self.cache_data(playlists, file_name)
+            return playlists
 
 
     def collect_all_playlists_for_user(self):
@@ -161,7 +217,15 @@ class SpotifyQueries:
             logging.error(f"Failed to fetch playlists: {response.text}")
             return None
 
+# TODO: Check if still up to date
     def api_get_current_users_top_tracks(self):
+        """
+        Fetches the current user's top tracks from Spotify. Handles rate limiting and logs the status of the API call.
+        
+        Returns:
+            dict or None: A dictionary containing the user's top tracks if successful, or None if the request fails.
+        """
+
         logging.info("Fetching current user's top tracks...")
         endpoint = "https://api.spotify.com/v1/me/top/tracks"
         headers = {"Authorization": f"Bearer {self.access_token}"}

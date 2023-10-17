@@ -1,22 +1,19 @@
 # Import necessary modules
-from spotify_queries import SpotifyQueries
+from spotify_queries import SpotifyQueries 
 from filter_and_analyse_data import FilterAndAnalyseData
 from http.server import HTTPServer, BaseHTTPRequestHandler  # For capturing the authorization code
 from urllib.parse import urlparse, parse_qs  # For parsing URL and query strings
-import json
-import os
-import sys
+import json  # For loading the configuration file
+import sys  # For exiting the program
 import webbrowser  # For opening the web browser
 import threading  # For running the HTTP server in a separate thread and for threading.Event
-
-
 
 ########
 ## I. Loading Configs & Initialise Spotify
 
 # Load configuration from a JSON file
 try:
-    with open("config.json", "r") as f:
+    with open("./config.json", "r") as f:
         config = json.load(f)
 except (FileNotFoundError, json.JSONDecodeError) as e:
     print(f"Error loading config.json: {e}")
@@ -49,7 +46,7 @@ def get_auth_code():
             auth_code = query_components["code"][0] if "code" in query_components else None
             
             if auth_code:
-                print(f"Authorization code: {auth_code}")
+                #print(f"Authorization code: {auth_code}")
                 
                 # Fetch the access token using the authorization code
                 spotify.fetch_access_token(auth_code)
@@ -79,6 +76,7 @@ def get_auth_code():
     # Open the Spotify authorization URL in the default web browser
     auth_url = f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type=code&redirect_uri={redirect_uri}"
     webbrowser.open(auth_url)
+    
 
 # Fetch the authorization code
 get_auth_code()
@@ -90,27 +88,18 @@ access_token_fetched.wait()
 ## III. Query Spotify
 
 
-#This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
-#TODO: Cleanup the code of spotify queries. Maybe introducde something as debugging logging and normal operational logging
-spotify.load_or_fetch_playlists()
+# This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. 
+# Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
+playlist = spotify.load_or_fetch_playlists()
 
+# DEBUG: uncomment to print the playlist
+#print(playlist) 
 
-
-
-
-
-
+# TODO: Check if this still works
+    # [ ] It should create a seperate json file
+    # [ ] Use the same chaching mechanism as for the playlists
 #spotify.get_current_user_top_tracks()
 
-"""
-OLD!!
-# Initialize the Spotify API client with necessary credentials and scope
-spotify_diary = SpotifyDiary(client_id, client_secret, redirect_uri, scope)
-
-
-diary_playlists_tracks = spotify_diary.fetch_track_details_from_playlist()
-
-"""
 
 ########
 ## IV.) Data Operations
