@@ -91,7 +91,7 @@ access_token_fetched.wait()
 
 # This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. 
 # Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
-playlist = spotify.load_or_fetch_playlists()
+#playlist = spotify.load_or_fetch_playlists()
 
 # DEBUG: uncomment to print the playlist
 #print(playlist) 
@@ -99,7 +99,9 @@ playlist = spotify.load_or_fetch_playlists()
 # TODO: Check if this still works
     # [ ] It should create a seperate json file
     # [ ] Use the same chaching mechanism as for the playlists
-#spotify.get_current_user_top_tracks()
+top_tracks = spotify.load_or_fetch_top_tracks()
+# DEBUG: uncomment to print the playlist
+print(top_tracks)
 
 
 ########

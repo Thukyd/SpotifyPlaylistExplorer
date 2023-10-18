@@ -3,6 +3,8 @@ import json
 import os
 import requests
 import logging
+from datetime import datetime, timedelta # DEBUG: For troubleshooting token expiry
+
 
 
 # Initialize logging
@@ -135,16 +137,41 @@ class SpotifyQueries:
         file_name = "users_playlists"
 
         if self.cached_data_available(file_name):
-            print("Spotify data in cache - Reading from file")
+            print("Spotify playlist data in cache - Reading from file")
             # Read the cached data from the JSON file
             playlists = self.load_cached_data(file_name)
             return playlists
         else:
-            print("Fetching Spotify data via API...")
+            print("Fetching Spotify playlist data via API...")
             playlists = self.collect_all_playlists_for_user()
             # Cache the playlists in a JSON file
             self.cache_data(playlists, file_name)
             return playlists
+        
+    def load_or_fetch_top_tracks(self):
+        """
+        Retrieve the user's Spotify playlists. If cached data is available, it reads from the cache;
+        otherwise, it fetches the data via an API call and then caches it.
+        
+        Returns:
+            list: A list of dictionaries, each containing information about a playlist.
+        """
+
+        # Define the path to the JSON file where the data will be stored
+            #file_path = './cache/users_playlists.json'
+        file_name = "users_top_tracks"
+
+        if self.cached_data_available(file_name):
+            print("Spotify top tracks data in cache - Reading from file")
+            # Read the cached data from the JSON file
+            top_tracks = self.load_cached_data(file_name)
+            return top_tracks
+        else:
+            print("Fetching Spotify top tracks data via API...")
+            top_tracks = self.api_get_current_users_top_tracks()
+            # Cache the playlists in a JSON file
+            self.cache_data(top_tracks, file_name)
+            return top_tracks
 
 
     def collect_all_playlists_for_user(self):
@@ -214,10 +241,11 @@ class SpotifyQueries:
         elif response.status_code == 429:
             logging.error(f"Failed to fetch playlists due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
         else:
-            logging.error(f"Failed to fetch playlists: {response.text}")
+            logging.error(f"Failed to fetch playlists. Error {response.status_code}: {response.text}")
             return None
 
-# TODO: Check if still up to date
+# FIXME: There is a 403 error when trying to fetch the top tracks
+#    NOTE: This is not an implementation error of this method. Others reported the same.
     def api_get_current_users_top_tracks(self):
         """
         Fetches the current user's top tracks from Spotify. Handles rate limiting and logs the status of the API call.
@@ -230,11 +258,25 @@ class SpotifyQueries:
         endpoint = "https://api.spotify.com/v1/me/top/tracks"
         headers = {"Authorization": f"Bearer {self.access_token}"}
         response = requests.get(endpoint, headers=headers)
+# DEBUG:             
+        if self.expires_in:
+            expiry_time = datetime.now() + timedelta(seconds=self.expires_in)
+            if datetime.now() >= expiry_time - timedelta(minutes=5):
+                print("Warning: Token is nearing expiry or has expired.")
+        print("Authorization Header:", headers)
+        print("Using scope:", self.scope)
+        print("Using redirect URI:", self.redirect_uri)
+        print("Using client ID:", self.client_id)
+
+
         if response.status_code == 200:
             logging.info("Successfully fetched top tracks.")
             return json.loads(response.text)
         elif response.status_code == 429:
             logging.error(f"Failed to fetch top tracks due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
         else:
-            logging.error(f"Failed to fetch top tracks: {response.text}")
+            logging.error(f"Failed to fetch top tracks. Error {response.status_code}: {response.text}")
+# DEBUG:             
+            print(response)
+            print
             return None
