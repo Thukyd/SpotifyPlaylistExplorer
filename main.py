@@ -118,14 +118,9 @@ filtered_data = FilterAndAnalyseData(pattern, playlist)
 # filter through the plalists and save it in cache
 spotify_diary = filtered_data.get_filtered_playlists()
 # get the song details for each of the playlists
-
-# DEBUG  - test with one playlist
-# TODO - check with one playlist first - there is lot of not needed data resulting from the spotify query
-    # Check the api for specifics https://developer.spotify.com/documentation/web-api/reference/get-playlist 
-example_playlist = spotify.fetch_playlist_tracks("2qsvODzH4AwZBS6gV9DlUo")
-print(example_playlist)
-
-# TODO create a data strucutre for all fetched tracks
+# FIXME: still an error in the batch operation
+# TODO: There is also a snapshot_id => use that maybe for caching in reduce the calls 
+spotify_diary_tracks = spotify.fetch_playlist_tracks_batch(spotify_diary)
 
 # find top 10 songs in playlist
 # TODO: base is here but you need to get the song details for each of the spotify diary playlists first
@@ -153,8 +148,7 @@ print(example_playlist)
 
 # TODO: Function to find out the top 5 songes for each of the months represented by the lists - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter
 
-# TODO: Function to find the most popular songs world wide from your selection - possible inputs: playlist_songs, song_appearance, artist_counter, song_counter  
+# TODO: Function to find the most popular songs world wide from your selection  => there is a param: "popularity": 43, in the spotify api
 
 # TODO: Add tracks base on some audio features. 
 #   See also: https://developer.spotify.com/documentation/web-api/reference/get-several-audio-features
-

@@ -243,6 +243,18 @@ class SpotifyQueries:
         else:
             logging.error(f"Failed to fetch playlists. Error {response.status_code}: {response.text}")
             return None
+
+# FIXME: Error for this mehtod:
+# TODO: add logic which only adds the tracks if they are not already in the list and the snapshot_id is different
+    def fetch_playlist_tracks_batch(self, query_playlists):
+        fetched_playlists = []
+        ## go through each Id of playlis
+        # TODO: logic here
+        for id in query_playlists:
+            # inside of loop
+            fetched_playlists.append(self.fetch_playlist_tracks(id))
+        self.cache_data(fetched_playlists, "fetched_playlists_tracks")
+        return fetched_playlists
         
     def fetch_playlist_tracks(self, playlist_id):
         """
@@ -250,24 +262,36 @@ class SpotifyQueries:
         
         Parameters:
             playlist_id (str): The ID of the playlist to fetch.
+            fields (str): The fields to return for each track.
             
         Returns:
             dict or None: A dictionary containing the playlist's tracks if successful, or None if the request fails.
         """
         logging.info(f"Fetching tracks for playlist ID {playlist_id}...")
-        endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        # filter of dates we want to use - https://developer.spotify.com/documentation/web-api/reference/get-playlist 
+        fields = "id,name,tracks.items(track(artists(name, id, genres), name, id, popularity, album (name, id, release_date)))"
+        endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}?fields={fields}"
         headers = {"Authorization": f"Bearer {self.access_token}"}
         response = requests.get(endpoint, headers=headers)
         if response.status_code == 200:
             logging.info("Successfully fetched tracks.")
-            # DEBUG: JUST TO CHECK FOR ONE TEST DIRECTLY IN CACHE
-            self.cache_data(json.loads(response.text), playlist_id); 
+            #self.cache_data(json.loads(response.text), playlist_id); # just for debugging
             return json.loads(response.text)
         elif response.status_code == 429:
             logging.error(f"Failed to fetch tracks due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
         else:
             logging.error(f"Failed to fetch tracks. Error {response.status_code}: {response.text}")
             return None    
+
+
+
+
+
+
+
+
+
+
 
 # FIXME: There is a 403 error when trying to fetch the top tracks
 #    NOTE: This is not an implementation error of this method. Others reported the same.
