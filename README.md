@@ -1,10 +1,4 @@
 # Spotify Playlist Explorer: My 10-Year Music Diary
-# TODO: Update Docs - refactor without Spotipy usage
-- direct API Usage instead of Spotioy https://developer.spotify.com/documentation/web-api
-- OAuth 2.0 implementation
-- Caching for playlists
-- Refactoring to Data queries
-
 
 ## Introduction
 
@@ -14,13 +8,20 @@ The Playlist Explorer aims to fill this gap for. Built on the Spotipy Library (S
 
 ## Features
 
+- OAuth 2.0 Authentication
+- Direct API calls to Spotify
+- Caching for API results
 - Query all "diary" playlists that follow a specific naming pattern.
-- More features to be added.
+
+## Todos
+
+- [ ] Query tracks of all filtered playlists
+- [ ] Additional data analysis features
+- [ ] Visualizations
 
 ## Requirements
 
 - Python 3.x
-- Spotipy library
 - Spotify API credentials
 
 ## Configuration
@@ -52,3 +53,24 @@ self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Okto
    ```bash
    python main.py
    ```
+
+
+## Scripts Overview
+
+### main.py
+
+This is the entry point of the application. It imports necessary modules and sets up an HTTP server for capturing OAuth tokens.
+
+Usage:
+
+\`\`\`bash
+python main.py
+\`\`\`
+
+### spotify_queries.py
+
+This script handles all the Spotify API queries and OAuth2 authentication.
+
+### filter_and_analyse_data.py
+
+Contains a class \`FilterAndAnalyseData\` which is used for advanced data filtering and analysis.
