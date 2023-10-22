@@ -107,7 +107,7 @@ top_tracks = spotify.load_or_fetch_top_tracks()
 
 
 ########
-## IV.) Data Operations
+## IV.) Analyse Data
 
 # Create an instance of the FilterAndAnalyseData class
 #TODO: use patern to find the date in the playlist name - think about where to store this? Directly here in the code? In the config file?
