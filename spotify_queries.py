@@ -243,6 +243,31 @@ class SpotifyQueries:
         else:
             logging.error(f"Failed to fetch playlists. Error {response.status_code}: {response.text}")
             return None
+        
+    def fetch_playlist_tracks(self, playlist_id):
+        """
+        Fetch the tracks for a given playlist from the Spotify API.
+        
+        Parameters:
+            playlist_id (str): The ID of the playlist to fetch.
+            
+        Returns:
+            dict or None: A dictionary containing the playlist's tracks if successful, or None if the request fails.
+        """
+        logging.info(f"Fetching tracks for playlist ID {playlist_id}...")
+        endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        headers = {"Authorization": f"Bearer {self.access_token}"}
+        response = requests.get(endpoint, headers=headers)
+        if response.status_code == 200:
+            logging.info("Successfully fetched tracks.")
+            # DEBUG: JUST TO CHECK FOR ONE TEST DIRECTLY IN CACHE
+            self.cache_data(json.loads(response.text), playlist_id); 
+            return json.loads(response.text)
+        elif response.status_code == 429:
+            logging.error(f"Failed to fetch tracks due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
+        else:
+            logging.error(f"Failed to fetch tracks. Error {response.status_code}: {response.text}")
+            return None    
 
 # FIXME: There is a 403 error when trying to fetch the top tracks
 #    NOTE: This is not an implementation error of this method. Others reported the same.
