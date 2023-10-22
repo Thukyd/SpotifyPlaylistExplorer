@@ -4,7 +4,8 @@
 
 What do you do when you've accumulated a decade's worth of carefully curated Spotify playlists, organized month by month? For me, it's not just a matter of hitting the shuffle button. Each playlist is a chapter in a 10-year musical journey, each one connected with vivid memories. However, I found no existing tools that could analyze these specific playlists in the way I wanted.
 
-The Playlist Explorer aims to fill this gap for. Built on the Spotipy Library (Spotify API), the scropt queries playlists based on your criterias (for me some basic regex). It assembles data structures that include the complete track list, frequency of song appearances across playlists, most-added artists, and more. There are several pre-defined outputs which provide a chance to explore your musical history, offering insights that might give you some inspiration for new plyalists.
+The Playlist Explorer aims to fill this gap for. Built on the [Spotify API](https://developer.spotify.com/documentation/web-api)
+, the script queries playlists based on your criterias (for me some basic regex). It assembles data structures that include the complete track list, frequency of song appearances across playlists, most-added artists, and more. There are several pre-defined outputs which provide a chance to explore your musical history, offering insights that might give you some inspiration for new plyalists.
 
 ## Features
 
