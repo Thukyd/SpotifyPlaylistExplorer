@@ -64,11 +64,11 @@ self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Okto
 
 This is the entry point of the application. It imports necessary modules and sets up an HTTP server for capturing OAuth tokens.
 
-- I. Loading Configs & Initialise Spotify
-- II. OAuth 2.0 Flow
-- III. Query Spotify
-- IV. Analyse Data
-- V. Visualisations
+1. Loading Configs & Initialise Spotify
+2. OAuth 2.0 Flow
+3. Query Spotify
+4. Analyse Data
+5. Visualisations
 
 ### spotify_queries.py
 
