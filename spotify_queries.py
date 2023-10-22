@@ -246,6 +246,10 @@ class SpotifyQueries:
 
 # FIXME: There is a 403 error when trying to fetch the top tracks
 #    NOTE: This is not an implementation error of this method. Others reported the same.
+#    FIXME: Do you need to add the params for limit and time range? => might be the solution
+    # https://stackoverflow.com/questions/75368571/cant-figure-out-auth-error-for-spotify-api-in-python-seeming-randomly-getting
+    # https://stackoverflow.com/questions/62945183/error-403-when-trying-to-control-playback-on-another-device-through-spotipy-libr 
+    # https://stackoverflow.com/questions/76675885/spotify-api-responding-with-error-code-403-when-requesting-top-songs-of-a-user
     def api_get_current_users_top_tracks(self):
         """
         Fetches the current user's top tracks from Spotify. Handles rate limiting and logs the status of the API call.
