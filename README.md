@@ -36,11 +36,13 @@ self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Okto
 ## Setup
 
 1. Install required packages:
+
    ```bash
    pip install -r requirements.txt
    ```
-   
+
 2. Add your Spotify API credentials to `config.json`:
+
    ```json
    {
      "client_id": "your_client_id_here",
@@ -49,12 +51,12 @@ self.pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Okto
      "scope": "playlist-read-private, user-top-read"
    }
    ```
-   
+
 3. Run the main script:
+
    ```bash
    python main.py
    ```
-
 
 ## Scripts Overview
 
