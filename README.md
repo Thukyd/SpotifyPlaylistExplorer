@@ -23,6 +23,7 @@ The Playlist Explorer aims to fill this gap for. Built on the [Spotify API](http
 ## Requirements
 
 - Python 3.x
+- Requests
 - Spotify API credentials
 
 ## Configuration

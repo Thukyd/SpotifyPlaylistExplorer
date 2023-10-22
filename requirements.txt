@@ -1,1 +1,1 @@
-# TODO: Update requirements
+requests==2.26.0
