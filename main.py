@@ -91,6 +91,15 @@ access_token_fetched.wait()
 
 # This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. 
 # Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
+
+# TODO: introduce time based caching
+#    - split the load / fatch and introduce the caching library
+#    - this should be the first check: are there any chaached jsons and are they up-to-date
+#    - for playlists you can make use of the snapshot functionality instead of time-stamps
+#    - when the check is done, this should be part of the config that is loaded into the class spotify
+#    - everytime there is new caching, the config should be updated
+#    Acceptance criteria: if i delete a cached part, it the config should recognize that. => rethink the implementation strategy
+
 playlist = spotify.load_or_fetch_playlists()
 
 # DEBUG: uncomment to print the playlist
