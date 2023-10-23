@@ -3,49 +3,13 @@ import json
 import os
 import requests
 import logging
-from datetime import datetime, timedelta # DEBUG: For troubleshooting token expiry
-
-
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 
 class SpotifyQueries:
-    def __init__(self, client_id, client_secret, redirect_uri, scope):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.redirect_uri = redirect_uri
-        self.scope = scope
-        self.access_token = None
-        self.token_type = None
-        self.expires_in = None
-        self.refresh_token = None
-
-    def generate_auth_url(self):
-        base_url = "https://accounts.spotify.com/authorize"
-        response_type = "code"
-        auth_url = f"{base_url}?client_id={self.client_id}&response_type={response_type}&redirect_uri={self.redirect_uri}&scope={self.scope}"
-        return auth_url
-
-    def fetch_access_token(self, auth_code):
-        token_url = "https://accounts.spotify.com/api/token"
-        payload = {
-            'grant_type': 'authorization_code',
-            'code': auth_code,
-            'redirect_uri': self.redirect_uri,
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-        }
-        response = requests.post(token_url, data=payload)
-        if response.status_code == 200:
-            token_info = json.loads(response.text)
-            self.access_token = token_info['access_token']
-            self.token_type = token_info['token_type']
-            self.expires_in = token_info['expires_in']
-            self.refresh_token = token_info.get('refresh_token')
-            print("Access token fetched successfully")
-        else:
-            print(f"Failed to get access token: {response.text}")
+    def __init__(self, access_token):
+        self.access_token = access_token
 
     def cached_data_available(self, file_name):
         """
@@ -284,15 +248,6 @@ class SpotifyQueries:
             return None    
 
 
-
-
-
-
-
-
-
-
-
 # FIXME: There is a 403 error when trying to fetch the top tracks
 #    NOTE: This is not an implementation error of this method. Others reported the same.
 #    FIXME: Do you need to add the params for limit and time range? => might be the solution
@@ -311,16 +266,6 @@ class SpotifyQueries:
         endpoint = "https://api.spotify.com/v1/me/top/tracks"
         headers = {"Authorization": f"Bearer {self.access_token}"}
         response = requests.get(endpoint, headers=headers)
-# DEBUG:             
-        if self.expires_in:
-            expiry_time = datetime.now() + timedelta(seconds=self.expires_in)
-            if datetime.now() >= expiry_time - timedelta(minutes=5):
-                print("Warning: Token is nearing expiry or has expired.")
-        print("Authorization Header:", headers)
-        print("Using scope:", self.scope)
-        print("Using redirect URI:", self.redirect_uri)
-        print("Using client ID:", self.client_id)
-
 
         if response.status_code == 200:
             logging.info("Successfully fetched top tracks.")
@@ -329,7 +274,4 @@ class SpotifyQueries:
             logging.error(f"Failed to fetch top tracks due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
         else:
             logging.error(f"Failed to fetch top tracks. Error {response.status_code}: {response.text}")
-# DEBUG:             
-            print(response)
-            print
             return None
