@@ -3,6 +3,7 @@ import json
 import os
 import requests
 import logging
+from urllib.parse import urlencode
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
@@ -208,18 +209,21 @@ class SpotifyQueries:
             logging.error(f"Failed to fetch playlists. Error {response.status_code}: {response.text}")
             return None
 
-# FIXME: Error for this mehtod:
-# TODO: add logic which only adds the tracks if they are not already in the list and the snapshot_id is different
+# TODO: the tracks if they are not already in the list and the snapshot_id is different
+# TODO: Add comments for the methods
     def fetch_playlist_tracks_batch(self, query_playlists):
         fetched_playlists = []
-        ## go through each Id of playlis
-        # TODO: logic here
-        for id in query_playlists:
-            # inside of loop
-            fetched_playlists.append(self.fetch_playlist_tracks(id))
+        # Iterate through each playlist dictionary in the list
+        for playlist_info in query_playlists:
+            # Extract the ID from each dictionary
+            playlist_id = playlist_info['id']
+            # Fetch tracks for this playlist ID and append to fetched_playlists
+            fetched_playlists.append(self.fetch_playlist_tracks(playlist_id))
+        # Cache the fetched data (assuming self.cache_data is a method that does this)
         self.cache_data(fetched_playlists, "fetched_playlists_tracks")
         return fetched_playlists
-        
+    
+
     def fetch_playlist_tracks(self, playlist_id):
         """
         Fetch the tracks for a given playlist from the Spotify API.
@@ -231,21 +235,29 @@ class SpotifyQueries:
         Returns:
             dict or None: A dictionary containing the playlist's tracks if successful, or None if the request fails.
         """
-        logging.info(f"Fetching tracks for playlist ID {playlist_id}...")
+        # uncomment for debugging
+        #logging.info(f"Fetching tracks for playlist ID {playlist_id}...")
         # filter of dates we want to use - https://developer.spotify.com/documentation/web-api/reference/get-playlist 
-        fields = "id,name,tracks.items(track(artists(name, id, genres), name, id, popularity, album (name, id, release_date)))"
-        endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}?fields={fields}"
+        fields = "id,name,tracks.items(track(artists(name,id,genres),name,id,popularity,album(name,id,release_date)))"
+        params = {'fields': fields}
+        encoded_params = urlencode(params)
+        endpoint = f"https://api.spotify.com/v1/playlists/{playlist_id}?{encoded_params}"
+
         headers = {"Authorization": f"Bearer {self.access_token}"}
+
         response = requests.get(endpoint, headers=headers)
+
         if response.status_code == 200:
             logging.info("Successfully fetched tracks.")
-            #self.cache_data(json.loads(response.text), playlist_id); # just for debugging
             return json.loads(response.text)
         elif response.status_code == 429:
             logging.error(f"Failed to fetch tracks due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
+        elif response.status_code == 404:
+            logging.error(f"Playlist not found. Check if the playlist ID {playlist_id} is correct.")
         else:
             logging.error(f"Failed to fetch tracks. Error {response.status_code}: {response.text}")
-            return None    
+
+        return None    
 
 
 # FIXME: There is a 403 error when trying to fetch the top tracks
