@@ -209,10 +209,9 @@ class SpotifyQueries:
             logging.error(f"Failed to fetch playlists. Error {response.status_code}: {response.text}")
             return None
 
-# TODO: the tracks if they are not already in the list and the snapshot_id is different
-# TODO: Add comments for the methods
     def fetch_playlist_tracks_batch(self, query_playlists):
         fetched_playlists = []
+        logging.info(f"Fetching tracks for {len(query_playlists)} playlists...")
         # Iterate through each playlist dictionary in the list
         for playlist_info in query_playlists:
             # Extract the ID from each dictionary
@@ -221,6 +220,7 @@ class SpotifyQueries:
             fetched_playlists.append(self.fetch_playlist_tracks(playlist_id))
         # Cache the fetched data (assuming self.cache_data is a method that does this)
         self.cache_data(fetched_playlists, "fetched_playlists_tracks")
+        logging.info(f"Successfully fetched playlist tracks.") 
         return fetched_playlists
     
 
@@ -248,7 +248,8 @@ class SpotifyQueries:
         response = requests.get(endpoint, headers=headers)
 
         if response.status_code == 200:
-            logging.info("Successfully fetched tracks.")
+            # uncomment for debugging
+            #logging.info("Successfully fetched tracks.") 
             return json.loads(response.text)
         elif response.status_code == 429:
             logging.error(f"Failed to fetch tracks due to rate limiting. More info: https://developer.spotify.com/documentation/web-api/concepts/rate-limits")
@@ -259,16 +260,9 @@ class SpotifyQueries:
 
         return None    
 
-
-# FIXME: There is a 403 error when trying to fetch the top tracks
-#    NOTE: This is not an implementation error of this method. Others reported the same.
-#    FIXME: Do you need to add the params for limit and time range? => might be the solution
-    # https://stackoverflow.com/questions/75368571/cant-figure-out-auth-error-for-spotify-api-in-python-seeming-randomly-getting
-    # https://stackoverflow.com/questions/62945183/error-403-when-trying-to-control-playback-on-another-device-through-spotipy-libr 
-    # https://stackoverflow.com/questions/76675885/spotify-api-responding-with-error-code-403-when-requesting-top-songs-of-a-user
     def api_get_current_users_top_tracks(self):
         """
-        Fetches the current user's top tracks from Spotify. Handles rate limiting and logs the status of the API call.
+        Fetches the current user's top 20 tracks from Spotify. Handles rate limiting and logs the status of the API call.
         
         Returns:
             dict or None: A dictionary containing the user's top tracks if successful, or None if the request fails.

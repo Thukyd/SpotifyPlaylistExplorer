@@ -19,53 +19,34 @@ spotify_auth.wait_for_token()
 access_token = spotify_auth.access_token
 
 
-
 ########
 ## II. Query Spotify
 
-
 # This code checks for a file named spotify_playlists.json in the current directory. If the file exists, it reads the playlists from there. 
 # Otherwise, it calls the spotify.get_current_user_playlists() function to fetch the data, and then it stores that data in the spotify_playlists.json file for future use.
-
-# TODO: introduce time based caching => do that before you go trough the whole OAuth flow again
-#    - split the load / fatch and introduce the caching library
-#    - this should be the first check: are there any chaached jsons and are they up-to-date
-#    - for playlists you can make use of the snapshot functionality instead of time-stamps
-#    - when the check is done, this should be part of the config that is loaded into the class spotify
-#    - everytime there is new caching, the config should be updated
-#    Acceptance criteria: if i delete a cached part, it the config should recognize that. => rethink the implementation strategy
-
 spotify = SpotifyQueries(access_token) # Initialize SpotifyQueries with the access token
 
-playlist = spotify.load_or_fetch_playlists()
+playlist = spotify.load_or_fetch_playlists() 
 
-# DEBUG: uncomment to print the playlist
-#print(playlist) 
-
-# TODO: don't load all of user 
 top_tracks = spotify.load_or_fetch_top_tracks()
-# DEBUG: uncomment to print the playlist
-#print(top_tracks)
 
 
 ########
 ## III. Filter and Analyse Data
-# Create an instance of the FilterAndAnalyseData class
-#TODO: use patern to find the date in the playlist name - think about where to store this? Directly here in the code? In the config file?
+# Patttern to filter the playlists, here for my diary playlists
 pattern = r'(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)(?: und (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember))? \d{4} *- *+'
 
-# handover all the playlists and the pattern to filter
 filtered_data = FilterAndAnalyseData(pattern, playlist)
-# filter through the plalists and save it in cache
+
+# filter through the playlist to find the diary playlists
 spotify_diary = filtered_data.get_filtered_playlists()
 # get the song details for each of the playlists
-# FIXME: still an error in the batch operation
-# TODO: There is also a snapshot_id => use that maybe for caching in reduce the calls 
 spotify_diary_tracks = spotify.fetch_playlist_tracks_batch(spotify_diary)
 
 # find top 10 songs in playlist
 # TODO: base is here but you need to get the song details for each of the spotify diary playlists first
-#top_10_songs = filtered_data.get_top_10_songs()
+# FIXME: this is not working yet
+top_10_songs = filtered_data.get_top_10_songs()
 
 
 
@@ -93,3 +74,15 @@ spotify_diary_tracks = spotify.fetch_playlist_tracks_batch(spotify_diary)
 
 # TODO: Add tracks base on some audio features. 
 #   See also: https://developer.spotify.com/documentation/web-api/reference/get-several-audio-features
+
+
+
+###################################
+### Backlog
+# TODO: introduce time based caching => do that before you go trough the whole OAuth flow again
+#    - split the load / fatch and introduce the caching library
+#    - this should be the first check: are there any chaached jsons and are they up-to-date
+#    - for playlists you can make use of the snapshot functionality instead of time-stamps
+#    - when the check is done, this should be part of the config that is loaded into the class spotify
+#    - everytime there is new caching, the config should be updated
+#    Acceptance criteria: if i delete a cached part, it the config should recognize that. => rethink the implementation strategy
